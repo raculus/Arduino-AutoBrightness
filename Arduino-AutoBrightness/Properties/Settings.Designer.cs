@@ -34,5 +34,17 @@ namespace Arduino_AutoBrightness.Properties {
                 this["LastUsePort"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int LastBrightAdjust {
+            get {
+                return ((int)(this["LastBrightAdjust"]));
+            }
+            set {
+                this["LastBrightAdjust"] = value;
+            }
+        }
     }
 }

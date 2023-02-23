@@ -18,6 +18,7 @@ namespace Arduino_AutoBrightness
         bool toggle = false;
         static int prevBright = -1;
         static int bright;
+        int adjustBright = 0;
         static SerialPort serialPort = new SerialPort();
         public Form_Main()
         {
@@ -66,10 +67,20 @@ namespace Arduino_AutoBrightness
 
         private void ChangeBrightness(int brightness)
         {
+            if(brightness < 0) brightness = 0;
+            else if(brightness > 100) brightness = 100;
+
             var psi = new ProcessStartInfo();
             psi.FileName = Environment.GetEnvironmentVariable("LocalAppData") + @"\Microsoft\WindowsApps\Monitorian.exe";
             psi.Arguments = @"/set all "+brightness;
             Process.Start(psi);
+            Debug.WriteLine("밝기: " + brightness + "%");
+            if (label_CurrentBright.InvokeRequired)
+            {
+                this.label_CurrentBright.Invoke(new MethodInvoker(delegate { label_CurrentBright.Text = "밝기 " + brightness + "%"; }));
+            }
+            else
+                label_CurrentBright.Text = "밝기 " + brightness + "%";
         }
 
         private void serialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
@@ -85,8 +96,7 @@ namespace Arduino_AutoBrightness
                 {
                     return;
                 }
-                ChangeBrightness(bright);
-                Debug.WriteLine("밝기: " + bright + "%");
+                ChangeBrightness(bright+adjustBright);
             }
             catch(Exception ex)
             {
@@ -119,6 +129,7 @@ namespace Arduino_AutoBrightness
             comboBox_Port.SelectedIndex = 0;
             button_Connect_Click(sender, e);
             notifyIcon.ContextMenuStrip = contextMenuStrip;
+            trackBar_adjustBright.Value = Properties.Settings.Default.LastBrightAdjust;
         }
 
         private void 열기ToolStripMenuItem_Click(object sender, EventArgs e)
@@ -130,14 +141,15 @@ namespace Arduino_AutoBrightness
 
         private void 종료ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            this.Close();
-
             if (serialPort.IsOpen)
             {
                 serialPort.Close();
                 Properties.Settings.Default.LastUsePort = serialPort.PortName;
-                Properties.Settings.Default.Save();
             }
+            Properties.Settings.Default.LastBrightAdjust = trackBar_adjustBright.Value;
+            Properties.Settings.Default.Save();
+
+            Application.Exit();
         }
 
         private void notifyIcon_MouseDoubleClick(object sender, MouseEventArgs e)
@@ -149,6 +161,12 @@ namespace Arduino_AutoBrightness
         {
             toggle = !toggle;
             일시정지ToolStripMenuItem.Checked= toggle;
+        }
+
+        private void trackBar_adjustBright_Scroll(object sender, EventArgs e)
+        {
+            adjustBright = trackBar_adjustBright.Value;
+            ChangeBrightness(bright + trackBar_adjustBright.Value);
         }
     }
 }

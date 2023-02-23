@@ -35,9 +35,13 @@
             this.notifyIcon = new System.Windows.Forms.NotifyIcon(this.components);
             this.contextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.열기ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.종료ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.일시정지ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.종료ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.trackBar_adjustBright = new System.Windows.Forms.TrackBar();
+            this.label1 = new System.Windows.Forms.Label();
+            this.label_CurrentBright = new System.Windows.Forms.Label();
             this.contextMenuStrip.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.trackBar_adjustBright)).BeginInit();
             this.SuspendLayout();
             // 
             // comboBox_Port
@@ -75,34 +79,65 @@
             this.일시정지ToolStripMenuItem,
             this.종료ToolStripMenuItem});
             this.contextMenuStrip.Name = "contextMenuStrip";
-            this.contextMenuStrip.Size = new System.Drawing.Size(181, 92);
+            this.contextMenuStrip.Size = new System.Drawing.Size(123, 70);
             // 
             // 열기ToolStripMenuItem
             // 
             this.열기ToolStripMenuItem.Name = "열기ToolStripMenuItem";
-            this.열기ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.열기ToolStripMenuItem.Size = new System.Drawing.Size(122, 22);
             this.열기ToolStripMenuItem.Text = "열기";
             this.열기ToolStripMenuItem.Click += new System.EventHandler(this.열기ToolStripMenuItem_Click);
-            // 
-            // 종료ToolStripMenuItem
-            // 
-            this.종료ToolStripMenuItem.Name = "종료ToolStripMenuItem";
-            this.종료ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.종료ToolStripMenuItem.Text = "종료";
-            this.종료ToolStripMenuItem.Click += new System.EventHandler(this.종료ToolStripMenuItem_Click);
             // 
             // 일시정지ToolStripMenuItem
             // 
             this.일시정지ToolStripMenuItem.Name = "일시정지ToolStripMenuItem";
-            this.일시정지ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.일시정지ToolStripMenuItem.Size = new System.Drawing.Size(122, 22);
             this.일시정지ToolStripMenuItem.Text = "일시정지";
             this.일시정지ToolStripMenuItem.Click += new System.EventHandler(this.일시정지ToolStripMenuItem_Click);
+            // 
+            // 종료ToolStripMenuItem
+            // 
+            this.종료ToolStripMenuItem.Name = "종료ToolStripMenuItem";
+            this.종료ToolStripMenuItem.Size = new System.Drawing.Size(122, 22);
+            this.종료ToolStripMenuItem.Text = "종료";
+            this.종료ToolStripMenuItem.Click += new System.EventHandler(this.종료ToolStripMenuItem_Click);
+            // 
+            // trackBar_adjustBright
+            // 
+            this.trackBar_adjustBright.Location = new System.Drawing.Point(13, 122);
+            this.trackBar_adjustBright.Minimum = -10;
+            this.trackBar_adjustBright.Name = "trackBar_adjustBright";
+            this.trackBar_adjustBright.Size = new System.Drawing.Size(200, 45);
+            this.trackBar_adjustBright.TabIndex = 2;
+            this.trackBar_adjustBright.Scroll += new System.EventHandler(this.trackBar_adjustBright_Scroll);
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(12, 99);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(74, 20);
+            this.label1.TabIndex = 3;
+            this.label1.Text = "밝기 조절";
+            // 
+            // label_CurrentBright
+            // 
+            this.label_CurrentBright.AutoSize = true;
+            this.label_CurrentBright.Location = new System.Drawing.Point(132, 99);
+            this.label_CurrentBright.Name = "label_CurrentBright";
+            this.label_CurrentBright.Size = new System.Drawing.Size(81, 20);
+            this.label_CurrentBright.TabIndex = 4;
+            this.label_CurrentBright.Text = "밝기 100%";
+            this.label_CurrentBright.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // Form_Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(228, 108);
+            this.ClientSize = new System.Drawing.Size(229, 163);
+            this.Controls.Add(this.label_CurrentBright);
+            this.Controls.Add(this.label1);
+            this.Controls.Add(this.trackBar_adjustBright);
             this.Controls.Add(this.button_Connect);
             this.Controls.Add(this.comboBox_Port);
             this.Font = new System.Drawing.Font("Malgun Gothic", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
@@ -117,7 +152,9 @@
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.Load += new System.EventHandler(this.Form1_Load);
             this.contextMenuStrip.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.trackBar_adjustBright)).EndInit();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -130,6 +167,9 @@
         private System.Windows.Forms.ToolStripMenuItem 열기ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem 종료ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem 일시정지ToolStripMenuItem;
+        private System.Windows.Forms.TrackBar trackBar_adjustBright;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label label_CurrentBright;
     }
 }
 

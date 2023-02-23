@@ -5,5 +5,8 @@
     <Setting Name="LastUsePort" Type="System.String" Scope="User">
       <Value Profile="(Default)">COM3</Value>
     </Setting>
+    <Setting Name="LastBrightAdjust" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

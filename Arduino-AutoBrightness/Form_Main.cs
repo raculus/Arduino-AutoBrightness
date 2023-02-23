@@ -15,7 +15,8 @@ namespace Arduino_AutoBrightness
 {
     public partial class Form_Main : Form
     {
-        static int prevBright;
+        bool toggle = false;
+        static int prevBright = -1;
         static int bright;
         static SerialPort serialPort = new SerialPort();
         public Form_Main()
@@ -27,6 +28,7 @@ namespace Arduino_AutoBrightness
         private void button_Connect_Click(object sender, EventArgs e)
         {
             if(comboBox_Port.SelectedItem == null) {
+
                 return;
             }
             try
@@ -50,7 +52,16 @@ namespace Arduino_AutoBrightness
             {
                 MessageBox.Show(ex.Message, "연결오류");
             }
-            comboBox_Port.Enabled = !serialPort.IsOpen;
+            if (serialPort.IsOpen)
+            {
+                button_Connect.Text = "연결해제";
+                comboBox_Port.Enabled = false;
+            }
+            else
+            {
+                button_Connect.Text = "연결";
+                comboBox_Port.Enabled = true;
+            }
         }
 
         private void ChangeBrightness(int brightness)
@@ -63,35 +74,31 @@ namespace Arduino_AutoBrightness
 
         private void serialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
+            if (toggle)
+            {
+                return;
+            }
             try
             {
                 bright = Int32.Parse(serialPort.ReadLine());
-                if(prevBright == bright)
+                if(bright - prevBright <= 1 && bright - prevBright <= -1)
                 {
                     return;
                 }
-                else
-                {
-                    prevBright = bright;
-                }
-                Debug.WriteLine("밝기: "+bright+"%");
                 ChangeBrightness(bright);
+                Debug.WriteLine("밝기: " + bright + "%");
             }
             catch(Exception ex)
             {
                 Debug.WriteLine(ex);
                 return;
-            }            
+            }
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (serialPort.IsOpen)
-            {
-                serialPort.Close();
-                Properties.Settings.Default.LastUsePort = serialPort.PortName;
-                Properties.Settings.Default.Save();
-            }
+            e.Cancel = true;
+            this.Visible = false;
         }
 
 
@@ -106,11 +113,12 @@ namespace Arduino_AutoBrightness
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            this.Visible = false;
             string lastUsePort = Properties.Settings.Default.LastUsePort;
             comboBox_Port.Items.Add(lastUsePort);
             comboBox_Port.SelectedIndex = 0;
             button_Connect_Click(sender, e);
-            notifyIcon.ContextMenuStrip = ContextMenuStrip;
+            notifyIcon.ContextMenuStrip = contextMenuStrip;
         }
 
         private void 열기ToolStripMenuItem_Click(object sender, EventArgs e)
@@ -123,11 +131,24 @@ namespace Arduino_AutoBrightness
         private void 종료ToolStripMenuItem_Click(object sender, EventArgs e)
         {
             this.Close();
+
+            if (serialPort.IsOpen)
+            {
+                serialPort.Close();
+                Properties.Settings.Default.LastUsePort = serialPort.PortName;
+                Properties.Settings.Default.Save();
+            }
         }
 
         private void notifyIcon_MouseDoubleClick(object sender, MouseEventArgs e)
         {
             열기ToolStripMenuItem_Click(sender, e);
+        }
+
+        private void 일시정지ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            toggle = !toggle;
+            일시정지ToolStripMenuItem.Checked= toggle;
         }
     }
 }

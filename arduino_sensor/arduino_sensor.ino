@@ -1,6 +1,6 @@
 #define cdsPin A7
 
-int prevBright;
+int prevBright = 0;
 
 void setup() {
   // put your setup code here, to run once:
@@ -18,5 +18,5 @@ void loop() {
     prevBright = bright;
   }
   Serial.println(bright);
-  delay(500);
+  delay(1000);
 }

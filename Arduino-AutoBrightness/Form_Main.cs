@@ -107,6 +107,14 @@ namespace Arduino_AutoBrightness
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
+            if (serialPort.IsOpen)
+            {
+                serialPort.Close();
+                Properties.Settings.Default.LastUsePort = serialPort.PortName;
+            }
+            Properties.Settings.Default.LastBrightAdjust = trackBar_adjustBright.Value;
+            Properties.Settings.Default.Save();
+
             e.Cancel = true;
             this.Visible = false;
         }
@@ -141,14 +149,6 @@ namespace Arduino_AutoBrightness
 
         private void 종료ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (serialPort.IsOpen)
-            {
-                serialPort.Close();
-                Properties.Settings.Default.LastUsePort = serialPort.PortName;
-            }
-            Properties.Settings.Default.LastBrightAdjust = trackBar_adjustBright.Value;
-            Properties.Settings.Default.Save();
-
             Application.Exit();
         }
 

@@ -105,12 +105,15 @@
             // 
             // trackBar_adjustBright
             // 
+            this.trackBar_adjustBright.Enabled = false;
+            this.trackBar_adjustBright.LargeChange = 1;
             this.trackBar_adjustBright.Location = new System.Drawing.Point(13, 122);
             this.trackBar_adjustBright.Minimum = -10;
             this.trackBar_adjustBright.Name = "trackBar_adjustBright";
             this.trackBar_adjustBright.Size = new System.Drawing.Size(200, 45);
             this.trackBar_adjustBright.TabIndex = 2;
             this.trackBar_adjustBright.Scroll += new System.EventHandler(this.trackBar_adjustBright_Scroll);
+            this.trackBar_adjustBright.MouseUp += new System.Windows.Forms.MouseEventHandler(this.trackBar_adjustBright_MouseUp);
             // 
             // label1
             // 
@@ -128,7 +131,7 @@
             this.label_CurrentBright.Name = "label_CurrentBright";
             this.label_CurrentBright.Size = new System.Drawing.Size(81, 20);
             this.label_CurrentBright.TabIndex = 4;
-            this.label_CurrentBright.Text = "밝기 100%";
+            this.label_CurrentBright.Text = "밝기 000%";
             this.label_CurrentBright.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // button_selectProcesses

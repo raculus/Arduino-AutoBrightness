@@ -18,7 +18,7 @@ namespace Arduino_AutoBrightness
     {
         string[] processArr = { "" };
         bool toggle = false;
-        static int prevBright = -1;
+        static int prevBright;
         static int bright;
         int adjustBright = 0;
         static SerialPort serialPort = new SerialPort();
@@ -75,7 +75,7 @@ namespace Arduino_AutoBrightness
             psi.FileName = Environment.GetEnvironmentVariable("LocalAppData") + @"\Microsoft\WindowsApps\Monitorian.exe";
             psi.Arguments = @"/set all "+brightness;
             Process.Start(psi);
-            Debug.WriteLine("밝기: " + brightness + "%");
+            Debug.WriteLine("밝기변경: " + brightness + "%");
             if (label_CurrentBright.InvokeRequired)
             {
                 this.label_CurrentBright.Invoke(new MethodInvoker(delegate { label_CurrentBright.Text = "밝기 " + brightness + "%"; }));
@@ -86,22 +86,35 @@ namespace Arduino_AutoBrightness
 
         private void serialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
-            Process fgProc = ProcessUtils.getForegroundProcess();
-            if (toggle)
-            {
-                return;
-            }
             try
             {
                 bright = Int32.Parse(serialPort.ReadLine());
-                if(bright - prevBright <= 1 && bright - prevBright <= -1)
+                if (prevBright == null)
+                    prevBright = bright;
+                Debug.WriteLine("밝기: " + bright + "%");
+
+                if (toggle)
                 {
                     return;
                 }
+                //이전 밝기와 1~0차이일 경우 반영X
+                if (bright - prevBright >= -1 && bright - prevBright <= 1)
+                {
+                    return;
+                }
+                Process fgProc = ProcessUtils.getForegroundProcess();
                 if (!(processArr.Contains(fgProc.ProcessName)))
                 {
                     ChangeBrightness(bright + adjustBright);
+                    prevBright = bright;
                 }
+
+                if (trackBar_adjustBright.InvokeRequired)
+                {
+                    this.trackBar_adjustBright.Invoke(new MethodInvoker(delegate { trackBar_adjustBright.Enabled = true; }));
+                }
+                else
+                    trackBar_adjustBright.Enabled = true;
             }
             catch(Exception ex)
             {
@@ -153,6 +166,13 @@ namespace Arduino_AutoBrightness
 
         private void 종료ToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            if (serialPort.IsOpen)
+            {
+                serialPort.Close();
+                Properties.Settings.Default.LastUsePort = serialPort.PortName;
+            }
+            Properties.Settings.Default.LastBrightAdjust = trackBar_adjustBright.Value;
+            Properties.Settings.Default.Save();
             Environment.Exit(0);
         }
 
@@ -170,7 +190,6 @@ namespace Arduino_AutoBrightness
         private void trackBar_adjustBright_Scroll(object sender, EventArgs e)
         {
             adjustBright = trackBar_adjustBright.Value;
-            ChangeBrightness(bright + trackBar_adjustBright.Value);
         }
 
         private void button_selectProcesses_Click(object sender, EventArgs e)
@@ -183,6 +202,11 @@ namespace Arduino_AutoBrightness
         private void Form_SelectProcess_Closed(object sender, FormClosedEventArgs e)
         {
             processArr = Properties.Settings.Default.stopProcessList.Split('\n');
+        }
+
+        private void trackBar_adjustBright_MouseUp(object sender, MouseEventArgs e)
+        {
+            ChangeBrightness(bright + adjustBright);
         }
     }
 }

@@ -15,6 +15,8 @@ namespace Arduino_AutoBrightness
 {
     public partial class Form_Main : Form
     {
+        Thread thread;
+
         bool toggle = false;
         static int prevBright = -1;
         static int bright;
@@ -45,7 +47,7 @@ namespace Arduino_AutoBrightness
                     serialPort.DataBits = 8;
                     serialPort.StopBits = StopBits.One;
                     serialPort.Parity = Parity.None;
-                    serialPort.DataReceived += serialPort_DataReceived;
+                    //serialPort.DataReceived += serialPort_DataReceived;
                     serialPort.Open();
                 }
             }
@@ -83,6 +85,32 @@ namespace Arduino_AutoBrightness
                 label_CurrentBright.Text = "밝기 " + brightness + "%";
         }
 
+        private void serialRead()
+        {
+            while (true)
+            {
+                if (toggle)
+                {
+                    return;
+                }
+                try
+                {
+                    bright = Int32.Parse(serialPort.ReadLine());
+                    if (bright - prevBright <= 1 && bright - prevBright <= -1)
+                    {
+                        return;
+                    }
+                    ChangeBrightness(bright + adjustBright);
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex);
+                    return;
+                }
+                Thread.Sleep(100);
+            }
+        }
+        /*
         private void serialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
             if (toggle)
@@ -104,7 +132,7 @@ namespace Arduino_AutoBrightness
                 return;
             }
         }
-
+        */
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
             if (serialPort.IsOpen)
@@ -138,6 +166,9 @@ namespace Arduino_AutoBrightness
             button_Connect_Click(sender, e);
             notifyIcon.ContextMenuStrip = contextMenuStrip;
             trackBar_adjustBright.Value = Properties.Settings.Default.LastBrightAdjust;
+
+            thread = new Thread(serialRead);
+            thread.Start();
         }
 
         private void 열기ToolStripMenuItem_Click(object sender, EventArgs e)
@@ -149,7 +180,11 @@ namespace Arduino_AutoBrightness
 
         private void 종료ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Application.Exit();
+            thread.Abort();
+            if (Application.MessageLoop)
+                Application.Exit();
+            else
+                Environment.Exit(1);
         }
 
         private void notifyIcon_MouseDoubleClick(object sender, MouseEventArgs e)

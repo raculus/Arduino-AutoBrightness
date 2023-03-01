@@ -10,13 +10,13 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Windows.Forms.VisualStyles;
 
 namespace Arduino_AutoBrightness
 {
     public partial class Form_Main : Form
     {
-        Thread thread;
-
+        string[] processArr = { "" };
         bool toggle = false;
         static int prevBright = -1;
         static int bright;
@@ -26,7 +26,6 @@ namespace Arduino_AutoBrightness
         {
             InitializeComponent();
         }
-
 
         private void button_Connect_Click(object sender, EventArgs e)
         {
@@ -47,7 +46,7 @@ namespace Arduino_AutoBrightness
                     serialPort.DataBits = 8;
                     serialPort.StopBits = StopBits.One;
                     serialPort.Parity = Parity.None;
-                    //serialPort.DataReceived += serialPort_DataReceived;
+                    serialPort.DataReceived += serialPort_DataReceived;
                     serialPort.Open();
                 }
             }
@@ -85,34 +84,9 @@ namespace Arduino_AutoBrightness
                 label_CurrentBright.Text = "밝기 " + brightness + "%";
         }
 
-        private void serialRead()
-        {
-            while (true)
-            {
-                if (toggle)
-                {
-                    return;
-                }
-                try
-                {
-                    bright = Int32.Parse(serialPort.ReadLine());
-                    if (bright - prevBright <= 1 && bright - prevBright <= -1)
-                    {
-                        return;
-                    }
-                    ChangeBrightness(bright + adjustBright);
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine(ex);
-                    return;
-                }
-                Thread.Sleep(100);
-            }
-        }
-        /*
         private void serialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
+            Process fgProc = ProcessUtils.getForegroundProcess();
             if (toggle)
             {
                 return;
@@ -124,7 +98,10 @@ namespace Arduino_AutoBrightness
                 {
                     return;
                 }
-                ChangeBrightness(bright+adjustBright);
+                if (!(processArr.Contains(fgProc.ProcessName)))
+                {
+                    ChangeBrightness(bright + adjustBright);
+                }
             }
             catch(Exception ex)
             {
@@ -132,7 +109,6 @@ namespace Arduino_AutoBrightness
                 return;
             }
         }
-        */
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
             if (serialPort.IsOpen)
@@ -166,9 +142,6 @@ namespace Arduino_AutoBrightness
             button_Connect_Click(sender, e);
             notifyIcon.ContextMenuStrip = contextMenuStrip;
             trackBar_adjustBright.Value = Properties.Settings.Default.LastBrightAdjust;
-
-            thread = new Thread(serialRead);
-            thread.Start();
         }
 
         private void 열기ToolStripMenuItem_Click(object sender, EventArgs e)
@@ -180,11 +153,7 @@ namespace Arduino_AutoBrightness
 
         private void 종료ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            thread.Abort();
-            if (Application.MessageLoop)
-                Application.Exit();
-            else
-                Environment.Exit(1);
+            Environment.Exit(0);
         }
 
         private void notifyIcon_MouseDoubleClick(object sender, MouseEventArgs e)
@@ -202,6 +171,18 @@ namespace Arduino_AutoBrightness
         {
             adjustBright = trackBar_adjustBright.Value;
             ChangeBrightness(bright + trackBar_adjustBright.Value);
+        }
+
+        private void button_selectProcesses_Click(object sender, EventArgs e)
+        {
+            Form_SelectProcess form_SelectProcess = new Form_SelectProcess();
+            form_SelectProcess.FormClosed += new FormClosedEventHandler(Form_SelectProcess_Closed);
+            form_SelectProcess.ShowDialog();
+        }
+
+        private void Form_SelectProcess_Closed(object sender, FormClosedEventArgs e)
+        {
+            processArr = Properties.Settings.Default.stopProcessList.Split('\n');
         }
     }
 }

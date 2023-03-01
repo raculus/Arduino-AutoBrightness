@@ -40,6 +40,7 @@
             this.trackBar_adjustBright = new System.Windows.Forms.TrackBar();
             this.label1 = new System.Windows.Forms.Label();
             this.label_CurrentBright = new System.Windows.Forms.Label();
+            this.button_selectProcesses = new System.Windows.Forms.Button();
             this.contextMenuStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.trackBar_adjustBright)).BeginInit();
             this.SuspendLayout();
@@ -130,11 +131,22 @@
             this.label_CurrentBright.Text = "밝기 100%";
             this.label_CurrentBright.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
+            // button_selectProcesses
+            // 
+            this.button_selectProcesses.Location = new System.Drawing.Point(16, 169);
+            this.button_selectProcesses.Name = "button_selectProcesses";
+            this.button_selectProcesses.Size = new System.Drawing.Size(197, 38);
+            this.button_selectProcesses.TabIndex = 5;
+            this.button_selectProcesses.Text = "일시정지할 프로세스";
+            this.button_selectProcesses.UseVisualStyleBackColor = true;
+            this.button_selectProcesses.Click += new System.EventHandler(this.button_selectProcesses_Click);
+            // 
             // Form_Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(229, 163);
+            this.ClientSize = new System.Drawing.Size(229, 216);
+            this.Controls.Add(this.button_selectProcesses);
             this.Controls.Add(this.label_CurrentBright);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.trackBar_adjustBright);
@@ -170,6 +182,7 @@
         private System.Windows.Forms.TrackBar trackBar_adjustBright;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label_CurrentBright;
+        private System.Windows.Forms.Button button_selectProcesses;
     }
 }
 

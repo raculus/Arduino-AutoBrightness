@@ -155,6 +155,7 @@ namespace Arduino_AutoBrightness
             button_Connect_Click(sender, e);
             notifyIcon.ContextMenuStrip = contextMenuStrip;
             trackBar_adjustBright.Value = Properties.Settings.Default.LastBrightAdjust;
+            processArr = Properties.Settings.Default.stopProcessList.Split('\n');
         }
 
         private void 열기ToolStripMenuItem_Click(object sender, EventArgs e)

@@ -126,7 +126,6 @@ namespace Arduino_AutoBrightness
         {
             if (serialPort.IsOpen)
             {
-                serialPort.Close();
                 Properties.Settings.Default.LastUsePort = serialPort.PortName;
             }
             Properties.Settings.Default.LastBrightAdjust = trackBar_adjustBright.Value;

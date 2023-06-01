@@ -1,16 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Diagnostics;
-using System.Drawing;
 using System.IO.Ports;
 using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Windows.Forms.VisualStyles;
 
 namespace Arduino_AutoBrightness
 {
@@ -22,6 +14,7 @@ namespace Arduino_AutoBrightness
         static int bright;
         int adjustBright = 0;
         static SerialPort serialPort = new SerialPort();
+
         public Form_Main()
         {
             InitializeComponent();
@@ -71,10 +64,7 @@ namespace Arduino_AutoBrightness
             if(brightness < 0) brightness = 0;
             else if(brightness > 100) brightness = 100;
 
-            var psi = new ProcessStartInfo();
-            psi.FileName = Environment.GetEnvironmentVariable("LocalAppData") + @"\Microsoft\WindowsApps\Monitorian.exe";
-            psi.Arguments = @"/set all "+brightness;
-            Process.Start(psi);
+            Monitor.SetBrightness(brightness);
             Debug.WriteLine("밝기변경: " + brightness + "%");
             if (label_CurrentBright.InvokeRequired)
             {
@@ -89,8 +79,6 @@ namespace Arduino_AutoBrightness
             try
             {
                 bright = Int32.Parse(serialPort.ReadLine());
-                if (prevBright == null)
-                    prevBright = bright;
                 Debug.WriteLine("밝기: " + bright + "%");
 
                 if (toggle)

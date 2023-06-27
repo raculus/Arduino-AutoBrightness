@@ -47,6 +47,7 @@
             // 
             // comboBox_Port
             // 
+            this.comboBox_Port.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBox_Port.FormattingEnabled = true;
             this.comboBox_Port.Location = new System.Drawing.Point(13, 14);
             this.comboBox_Port.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);

@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.IO.Ports;
 using System.Linq;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace Arduino_AutoBrightness
@@ -12,42 +13,38 @@ namespace Arduino_AutoBrightness
         bool toggle = false;
         static int prevBright;
         static int bright;
-        int adjustBright = 0;
-        static SerialPort serialPort = new SerialPort();
+        int adjustBright = 0;  
 
         public Form_Main()
         {
             InitializeComponent();
+
+            SerialDataReceivedEventHandler handler = serialPort_DataReceived;
+            Arduino.AttachDataReceivedEvent(handler);
         }
 
-        private void button_Connect_Click(object sender, EventArgs e)
+        private void Connect(bool isShowErr)
         {
-            if(comboBox_Port.SelectedItem == null) {
-
+            if (comboBox_Port.SelectedItem == null)
+            {
                 return;
             }
+            string portName = comboBox_Port.SelectedItem.ToString();
+
             try
             {
-                if(serialPort.IsOpen)
-                {
-                    serialPort.Close();
-                }
-                else
-                {
-                    serialPort.PortName = comboBox_Port.SelectedItem.ToString();
-                    serialPort.BaudRate = 9600;
-                    serialPort.DataBits = 8;
-                    serialPort.StopBits = StopBits.One;
-                    serialPort.Parity = Parity.None;
-                    serialPort.DataReceived += serialPort_DataReceived;
-                    serialPort.Open();
-                }
+                Arduino.Connect(portName);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "연결오류");
+                Debug.WriteLine(ex.Message);
+                if(isShowErr)
+                    MessageBox.Show(ex.Message, "연결오류");
+                Thread.Sleep(1000);
+                Connect(false);
+
             }
-            if (serialPort.IsOpen)
+            if (Arduino.IsConnected())
             {
                 button_Connect.Text = "연결해제";
                 comboBox_Port.Enabled = false;
@@ -59,6 +56,11 @@ namespace Arduino_AutoBrightness
             }
         }
 
+        private void button_Connect_Click(object sender, EventArgs e)
+        {
+            Connect(true);
+        }
+
         private void ChangeBrightness(int brightness)
         {
             if(brightness < 0) brightness = 0;
@@ -67,9 +69,7 @@ namespace Arduino_AutoBrightness
             Monitor.SetBrightness(brightness);
             Debug.WriteLine("밝기변경: " + brightness + "%");
             if (label_CurrentBright.InvokeRequired)
-            {
-                this.label_CurrentBright.Invoke(new MethodInvoker(delegate { label_CurrentBright.Text = "밝기 " + brightness + "%"; }));
-            }
+                label_CurrentBright.Invoke(new MethodInvoker(delegate { label_CurrentBright.Text = "밝기 " + brightness + "%"; }));
             else
                 label_CurrentBright.Text = "밝기 " + brightness + "%";
         }
@@ -78,7 +78,7 @@ namespace Arduino_AutoBrightness
         {
             try
             {
-                bright = Int32.Parse(serialPort.ReadLine());
+                bright = Int32.Parse(Arduino.ReadLine());
                 Debug.WriteLine("밝기: " + bright + "%");
 
                 if (toggle)
@@ -112,9 +112,9 @@ namespace Arduino_AutoBrightness
         }
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (serialPort.IsOpen)
+            if (Arduino.IsConnected())
             {
-                Properties.Settings.Default.LastUsePort = serialPort.PortName;
+                Properties.Settings.Default.LastUsePort = Arduino.serialPort.PortName;
             }
             Properties.Settings.Default.LastBrightAdjust = trackBar_adjustBright.Value;
             Properties.Settings.Default.Save();
@@ -129,7 +129,8 @@ namespace Arduino_AutoBrightness
             comboBox_Port.Items.Clear();
             foreach (var item in SerialPort.GetPortNames())
             {
-                comboBox_Port.Items.Add(item);
+                if(item != "COM1")
+                    comboBox_Port.Items.Add(item);
             }
         }
 
@@ -139,7 +140,7 @@ namespace Arduino_AutoBrightness
             string lastUsePort = Properties.Settings.Default.LastUsePort;
             comboBox_Port.Items.Add(lastUsePort);
             comboBox_Port.SelectedIndex = 0;
-            button_Connect_Click(sender, e);
+            Connect(false);
             notifyIcon.ContextMenuStrip = contextMenuStrip;
             trackBar_adjustBright.Value = Properties.Settings.Default.LastBrightAdjust;
             processArr = Properties.Settings.Default.stopProcessList.Split('\n');
@@ -154,10 +155,10 @@ namespace Arduino_AutoBrightness
 
         private void 종료ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (serialPort.IsOpen)
+            if (Arduino.IsConnected())
             {
-                serialPort.Close();
-                Properties.Settings.Default.LastUsePort = serialPort.PortName;
+                Arduino.Disconnect();
+                Properties.Settings.Default.LastUsePort = Arduino.serialPort.PortName;
             }
             Properties.Settings.Default.LastBrightAdjust = trackBar_adjustBright.Value;
             Properties.Settings.Default.Save();

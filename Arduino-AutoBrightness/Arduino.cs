@@ -1,12 +1,13 @@
-﻿using System.IO.Ports;
+﻿using System.Diagnostics;
+using System.IO.Ports;
 
 namespace Arduino_AutoBrightness
 {
-    public class Arduino
+    public static class Arduino
     {
         public static SerialPort serialPort = new SerialPort();
 
-        public static void Connect(string portName, int baudRate = 9600, int dataBits = 8, StopBits stopBits = StopBits.One, Parity parity = Parity.None)
+        public static void Connect(string portName)
         {
             if (serialPort.IsOpen)
             {
@@ -15,11 +16,17 @@ namespace Arduino_AutoBrightness
             else
             {
                 serialPort.PortName = portName;
-                serialPort.BaudRate = baudRate;
-                serialPort.DataBits = dataBits;
-                serialPort.StopBits = stopBits;
-                serialPort.Parity = parity;
+                serialPort.BaudRate = 9600;
+                serialPort.DataBits = 8;
+                serialPort.StopBits = StopBits.One;
+                serialPort.Parity = Parity.None;
+                serialPort.Open();
             }
+        }
+
+        public static string ReadLine()
+        {
+            return serialPort.ReadLine();
         }
 
         public static void Disconnect()

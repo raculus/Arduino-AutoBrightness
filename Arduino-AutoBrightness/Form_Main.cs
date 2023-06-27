@@ -31,19 +31,23 @@ namespace Arduino_AutoBrightness
             }
             string portName = comboBox_Port.SelectedItem.ToString();
 
-            try
+            do
             {
-                Arduino.Connect(portName);
+                try
+                {
+                    Arduino.Connect(portName);
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex.Message);
+                    if (isShowErr)
+                        MessageBox.Show(ex.Message, "연결오류");
+                    Thread.Sleep(1000);
+                }
             }
-            catch (Exception ex)
-            {
-                Debug.WriteLine(ex.Message);
-                if(isShowErr)
-                    MessageBox.Show(ex.Message, "연결오류");
-                Thread.Sleep(1000);
-                Connect(false);
+            while (!Arduino.IsConnected());
 
-            }
+
             if (Arduino.IsConnected())
             {
                 button_Connect.Text = "연결해제";

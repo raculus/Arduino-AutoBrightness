@@ -31,22 +31,17 @@ namespace Arduino_AutoBrightness
             }
             string portName = comboBox_Port.SelectedItem.ToString();
 
-            do
+            try
             {
-                try
-                {
-                    Arduino.Connect(portName);
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine(ex.Message);
-                    if (isShowErr)
-                        MessageBox.Show(ex.Message, "연결오류");
-                    Thread.Sleep(1000);
-                }
+                Arduino.Connect(portName);
             }
-            while (!Arduino.IsConnected());
-
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                if (isShowErr)
+                    MessageBox.Show(ex.Message, "연결오류");
+                Thread.Sleep(1000);
+            }
 
             if (Arduino.IsConnected())
             {
@@ -199,6 +194,12 @@ namespace Arduino_AutoBrightness
 
         private void trackBar_adjustBright_MouseUp(object sender, MouseEventArgs e)
         {
+            ChangeBrightness(bright + adjustBright);
+        }
+
+        private void trackBar_adjustBright_ValueChanged(object sender, EventArgs e)
+        {
+            adjustBright = trackBar_adjustBright.Value;
             ChangeBrightness(bright + adjustBright);
         }
     }
